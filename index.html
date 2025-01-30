@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Электронный журнал класса</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            width: 80%;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        input[type="text"], input[type="date"], input[type="button"] {
+            padding: 8px;
+            margin: 5px;
+            font-size: 1em;
+        }
+        input[type="button"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="button"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Электронный журнал класса</h1>
+
+        <label for="surname">Фамилия:</label>
+        <input type="text" id="surname">
+        
+        <label for="name">Имя:</label>
+        <input type="text" id="name">
+        
+        <label for="patronymic">Отчество:</label>
+        <input type="text" id="patronymic">
+
+        <label for="birthdate">Дата рождения:</label>
+        <input type="date" id="birthdate">
+        
+        <label for="character">Характер:</label>
+        <input type="text" id="character">
+
+        <input type="button" value="Добавить ученика" onclick="addStudent()">
+
+        <table id="studentsTable">
+            <thead>
+                <tr>
+                    <th>Фамилия, Имя, Отчество</th>
+                    <th>Дата рождения</th>
+                    <th>Характер</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        function addStudent() {
+            const surname = document.getElementById('surname').value;
+            const name = document.getElementById('name').value;
+            const patronymic = document.getElementById('patronymic').value;
+            const birthdate = document.getElementById('birthdate').value;
+            const character = document.getElementById('character').value;
+
+            if (surname && name && patronymic && birthdate && character) {
+                const table = document.getElementById('studentsTable').getElementsByTagName('tbody')[0];
+                const newRow = table.insertRow();
+
+                const cell1 = newRow.insertCell(0);
+                cell1.textContent = `${surname} ${name} ${patronymic}`;
+
+                const cell2 = newRow.insertCell(1);
+                cell2.textContent = birthdate;
+
+                const cell3 = newRow.insertCell(2);
+                cell3.textContent = character;
+
+                // Clear input fields after adding student
+                document.getElementById('surname').value = '';
+                document.getElementById('name').value = '';
+                document.getElementById('patronymic').value = '';
+                document.getElementById('birthdate').value = '';
+                document.getElementById('character').value = '';
+            } else {
+                alert("Пожалуйста, заполните все поля!");
+            }
+        }
+    </script>
+
+</body>
+</html>
