@@ -4,6 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Электронный журнал класса</title>
+    <script type="module">
+        // Импортируем необходимые функции из SDK Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
+
+        // Ваши параметры конфигурации Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyA-bJj3upQ01SEslee159D6qLmL5t5Yh6o",
+            authDomain: "ourclass-6401a.firebaseapp.com",
+            projectId: "ourclass-6401a",
+            storageBucket: "ourclass-6401a.firebasestorage.app",
+            messagingSenderId: "575174286651",
+            appId: "1:575174286651:web:f054c043b44ed05680eb1e",
+            measurementId: "G-7B6VF33BMB"
+        };
+
+        // Инициализация Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Функция для добавления данных о студенте в Firebase
+        function addStudent() {
+            const surname = document.getElementById('surname').value;
+            const name = document.getElementById('name').value;
+            const patronymic = document.getElementById('patronymic').value;
+            const birthdate = document.getElementById('birthdate').value;
+            const character = document.getElementById('character').value;
+
+            if (surname && name && patronymic && birthdate && character) {
+                // Генерация уникального ID для каждого студента
+                const newStudentId = Date.now();
+
+                // Сохранение данных о студенте в Firebase
+                set(ref(db, 'students/' + newStudentId), {
+                    surname: surname,
+                    name: name,
+                    patronymic: patronymic,
+                    birthdate: birthdate,
+                    character: character
+                }).then(() => {
+                    alert("Ученик добавлен!");
+                    // Очистка полей после добавления
+                    document.getElementById('surname').value = '';
+                    document.getElementById('name').value = '';
+                    document.getElementById('patronymic').value = '';
+                    document.getElementById('birthdate').value = '';
+                    document.getElementById('character').value = '';
+                    loadStudents();  // Перезагрузить список студентов
+                }).catch((error) => {
+                    alert("Ошибка при добавлении студента: " + error);
+                });
+            } else {
+                alert("Пожалуйста, заполните все поля!");
+            }
+        }
+
+        // Функция для загрузки всех студентов из Firebase
+        function loadStudents() {
+            const studentsTable = document.getElementById('studentsTable').getElementsByTagName('tbody')[0];
+            studentsTable.innerHTML = '';  // Очистка таблицы
+
+            const studentsRef = ref(db, 'students');
+            get(studentsRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const students = snapshot.val();
+                    for (let studentId in students) {
+                        const student = students[studentId];
+                        const newRow = studentsTable.insertRow();
+                        const cell1 = newRow.insertCell(0);
+                        cell1.textContent = `${student.surname} ${student.name} ${student.patronymic}`;
+
+                        const cell2 = newRow.insertCell(1);
+                        cell2.textContent = student.birthdate;
+
+                        const cell3 = newRow.insertCell(2);
+                        cell3.textContent = student.character;
+                    }
+                } else {
+                    console.log("Данные о студентах не найдены.");
+                }
+            }).catch((error) => {
+                console.error("Ошибка загрузки данных: " + error);
+            });
+        }
+
+        // Загружаем студентов при загрузке страницы
+        window.onload = loadStudents;
+    </script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -86,68 +174,6 @@
             <tbody></tbody>
         </table>
     </div>
-
-    <script>
-        // Функция для добавления студента в таблицу
-        function addStudent() {
-            const surname = document.getElementById('surname').value;
-            const name = document.getElementById('name').value;
-            const patronymic = document.getElementById('patronymic').value;
-            const birthdate = document.getElementById('birthdate').value;
-            const character = document.getElementById('character').value;
-
-            if (surname && name && patronymic && birthdate && character) {
-                const student = { surname, name, patronymic, birthdate, character };
-                
-                // Получаем сохраненные данные из localStorage
-                let students = JSON.parse(localStorage.getItem('students')) || [];
-
-                // Добавляем нового ученика в массив
-                students.push(student);
-
-                // Сохраняем обновленный массив студентов в localStorage
-                localStorage.setItem('students', JSON.stringify(students));
-
-                // Добавляем строку в таблицу
-                addRowToTable(student);
-
-                // Очищаем поля ввода
-                document.getElementById('surname').value = '';
-                document.getElementById('name').value = '';
-                document.getElementById('patronymic').value = '';
-                document.getElementById('birthdate').value = '';
-                document.getElementById('character').value = '';
-            } else {
-                alert("Пожалуйста, заполните все поля!");
-            }
-        }
-
-        // Функция для добавления строки в таблицу
-        function addRowToTable(student) {
-            const table = document.getElementById('studentsTable').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow();
-
-            const cell1 = newRow.insertCell(0);
-            cell1.textContent = `${student.surname} ${student.name} ${student.patronymic}`;
-
-            const cell2 = newRow.insertCell(1);
-            cell2.textContent = student.birthdate;
-
-            const cell3 = newRow.insertCell(2);
-            cell3.textContent = student.character;
-        }
-
-        // Функция для загрузки студентов из localStorage при загрузке страницы
-        function loadStudents() {
-            const students = JSON.parse(localStorage.getItem('students')) || [];
-            students.forEach(student => {
-                addRowToTable(student);
-            });
-        }
-
-        // Загружаем студентов при загрузке страницы
-        window.onload = loadStudents;
-    </script>
 
 </body>
 </html>
